@@ -8,9 +8,15 @@ trigger: none
  
  
 #variables:
-#- group: 'E5_AzureLandingZone-IAC-VarGroup'
+#- group: ''
  
 stages:
+ # Install Terraform
+- task: TerraformInstaller@1
+      inputs:
+        terraformVersion: '1.5.5' # Specify a fixed version
+      displayName: 'Install Terraform'
+
 - stage: Build
   displayName: Terraform-Plan  
   jobs:
