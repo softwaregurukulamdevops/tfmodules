@@ -1,0 +1,55 @@
+pool:
+  name: ""
+ 
+variables:
+  AzureServiceConnection_init: ''
+  AzureServiceConnection_apply: ''
+ 
+stages:
+# Stage 1: Initialize Terraform
+- stage: 'devBuild'
+  displayName: 'Terraform-plan'
+  jobs:
+  - job: 'TerraformPlan'
+    displayName: 'Azure Update Manager'
+    steps:
+ 
+    
+    # Install Unzip Utility
+    - script: |
+        sudo apt-get install -y unzip
+      displayName: 'Install Unzip Utility'
+ 
+    # Install Terraform
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: '1.5.5' # Specify a fixed version
+      displayName: 'Install Terraform'
+ 
+    # Terraform Init
+    - task: TerraformCLI@1
+      displayName: 'Terraform-Init'
+      inputs:
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        allowTelemetryCollection: false
+ 
+    # Terraform Plan
+    - task: TerraformCLI@1
+      displayName: 'Terraform-Plan'
+      inputs:
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        environmentServiceName: '$(AzureServiceConnection_init)'
+        allowTelemetryCollection: false
+        publishPlanResults: 'Terraform plan'
+ 
+    # Terraform Apply
+    - task: TerraformCLI@1
+      displayName: 'Terraform-Apply'
+      inputs:
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        environmentServiceName: '$(AzureServiceConnection_apply)'
+        allowTelemetryCollection: false
+ 
