@@ -1,55 +1,86 @@
-pool:
-  name: ""
+# ------------------------------------------------------------------------------------ #
+# Description:
+#    Pipeline to deploy Azure policies for whitelisting services in BOIPROD Azure Tenant
+#
+# ------------------------------------------------------------------------------------ #
  
-variables:
-  AzureServiceConnection_init: ''
-  AzureServiceConnection_apply: ''
+trigger: none
+ 
+ 
+#variables:
+#- group: 'E5_AzureLandingZone-IAC-VarGroup'
  
 stages:
-# Stage 1: Initialize Terraform
-- stage: 'devBuild'
-  displayName: 'Terraform-plan'
+- stage: Build
+  displayName: Terraform-Plan  
   jobs:
-  - job: 'TerraformPlan'
-    displayName: 'Azure Update Manager'
+  - job: TerraformPlan
+    displayName: Terraform-Plan
+    pool:
+      name: ''
     steps:
- 
     
-    # Install Unzip Utility
-    - script: |
-        sudo apt-get install -y unzip
-      displayName: 'Install Unzip Utility'
- 
-    # Install Terraform
-    - task: TerraformInstaller@1
-      inputs:
-        terraformVersion: '1.5.5' # Specify a fixed version
-      displayName: 'Install Terraform'
- 
-    # Terraform Init
+      
     - task: TerraformCLI@1
-      displayName: 'Terraform-Init'
+      displayName: Terraform-Init
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
+        backendType: 'azurerm'
+        backendServiceArm: ''
+        backendAzureRmSubscriptionId: ''
+        backendAzureRmResourceGroupName: ''
+        backendAzureRmStorageAccountName: ''
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: ''
         allowTelemetryCollection: false
- 
-    # Terraform Plan
+        
     - task: TerraformCLI@1
-      displayName: 'Terraform-Plan'
+      displayName: Terraform-Plan
       inputs:
         command: 'plan'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        environmentServiceName: '$(AzureServiceConnection_init)'
+        workingDirectory: '$(System.DefaultWorkingDirectory)
+        environmentServiceName: ''
         allowTelemetryCollection: false
-        publishPlanResults: 'Terraform plan'
+        publishPlanResults: 'Terraform Plan'
  
-    # Terraform Apply
-    - task: TerraformCLI@1
-      displayName: 'Terraform-Apply'
-      inputs:
-        command: 'apply'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        environmentServiceName: '$(AzureServiceConnection_apply)'
-        allowTelemetryCollection: false
  
+- stage: Apply
+  displayName: Terraform-Apply 
+  dependsOn: Build
+  jobs:
+  - deployment: TerraformApply
+    displayName: Terraform-Apply
+    pool:
+      name: ''
+    environment: sandbox
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          
+    
+          - task: TerraformCLI@1
+            displayName: Terraform-Init
+            inputs:
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+              backendType: 'azurerm'
+              backendServiceArm: ''
+              backendAzureRmSubscriptionId: ''
+              backendAzureRmResourceGroupName: ''
+              backendAzureRmStorageAccountName: ''
+              backendAzureRmContainerName: 'tfstate'
+              backendAzureRmKey: ''
+              allowTelemetryCollection: false
+ 
+    
+          - task: TerraformCLI@1
+            displayName: Terraform-Apply
+            inputs:
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+              environmentServiceName: ''
+              allowTelemetryCollection: false
+ 
+    
