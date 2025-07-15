@@ -124,3 +124,12 @@ module "private_endpoint_appservice" {
   tags        = var.tags
 }
 
+module "network_security_group" {
+  source              = "./modules/network_security_group"
+  nsg_name            = var.nsg_name
+  resource_group_name = module.resource_group.resource_group_name
+  location            = module.resource_group.resource_group_location
+  subnet_id           = module.vnet.subnet_id
+  tags                = var.tags
+}
+
