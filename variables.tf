@@ -130,3 +130,8 @@ variable "subnet_address_prefix" {
   type        = string
 }
 
+variable "nsg_name" {
+  description = "The name of the Network Security Group."
+  type        = string
+}
+
