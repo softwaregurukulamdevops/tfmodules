@@ -16,7 +16,7 @@ app_service_plan_name = "evktexample-appservice-plan"
 app_service_plan_tier = "Basic"
 app_service_plan_size = "B1"
 app_service_name = "evktexample-appservice"
-cosmosdb_account_name = "evktexample-cosmosdb-mongo"
+cosmosdb_account_name = "evktexample-cosmosdb-mongo1"
 tags = {
   environment = "demo"
 }
@@ -25,6 +25,7 @@ vnet_name = "evkt-vnet"
 address_space = ["10.0.0.0/16"]
 subnet_name = "evkt-subnet"
 subnet_address_prefix = "10.0.1.0/24"
+nsg_name = "evkt-nsg"
 
 # Note: Ensure the storage account name is globally unique and follows Azure naming conventions:
 
